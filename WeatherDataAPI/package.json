@@ -1,0 +1,20 @@
+{
+  "name": "weatherdataapi",
+  "version": "1.0.0",
+  "description": "weather data api",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "weather-data-analyser-API"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "pg": "^8.7.1"
+  }
+}
