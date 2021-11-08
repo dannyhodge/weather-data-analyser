@@ -16,3 +16,6 @@ With Index:
 
 With both:
 
+
+
+The API itself is written in ExpressJS. It's quite simple, with the only complication being getting the data in a format that the front-end ngx-charts would accept. This probably ought've been done using a defined dto, however since this API was a means to and end, it was done by formatting the JSON string in order to change it's structure.
