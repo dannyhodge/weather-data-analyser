@@ -3,6 +3,8 @@ const app = express()
 const port = 3000
 const pg = require("pg");
 const fs = require("fs");
+const cors = require('cors'); 
+app.use(cors());
 require('dotenv').config();
 
 var filename = "./password.txt";
@@ -45,6 +47,58 @@ app.get('/tempdata', (req, res) => {      //get temperature data
     }
   );
 });
+
+app.get('/dewpointtempdata', (req, res) => {      //get dewpoint temp data
+  pool.query(
+    "SELECT date_recorded as name, AVG(hourly_temp_dewpoint) as value FROM weatherdata.weather_data " + 
+    "WHERE date_recorded > date_trunc('month', CURRENT_DATE) - INTERVAL '1 year' " + 
+    "AND station = 1 " + 
+    "GROUP BY date_recorded ORDER BY date_recorded asc",
+    function (err, result) {
+      var temp = "[{\"name\": \"Dewpoint Temperature\",\"series\": ";
+      temp += JSON.stringify(result.rows);
+      temp += " }]";
+      res.send(temp);
+      
+      if (err) return console.error(err);
+    }
+  );
+});
+
+app.get('/alltempdata', async (req, res) => {      //get dewpoint temp data
+  var responseContent = "[";
+  pool.query(
+    "SELECT date_recorded as name, AVG(hourly_temp_dewpoint) as value FROM weatherdata.weather_data " + 
+    "WHERE date_recorded > date_trunc('month', CURRENT_DATE) - INTERVAL '1 year' " + 
+    "AND station = 1 " + 
+    "GROUP BY date_recorded ORDER BY date_recorded asc",
+    function (err, result) {
+      responseContent += "{\"name\": \"Dewpoint Temperature\",\"series\": ";
+      responseContent += JSON.stringify(result.rows);
+      responseContent += " }, ";
+      
+      pool.query(
+        "SELECT date_recorded as name, AVG(hourly_temp_bulbtemp) as value FROM weatherdata.weather_data " + 
+        "WHERE date_recorded > date_trunc('month', CURRENT_DATE) - INTERVAL '1 year' " + 
+        "AND station = 1 " + 
+        "GROUP BY date_recorded ORDER BY date_recorded asc",
+        function (err, result) {
+          responseContent += "{\"name\": \"Wet Bulb Temperature\",\"series\": ";
+          responseContent += JSON.stringify(result.rows);
+          responseContent += " }";
+          responseContent += " ]";
+          res.send(responseContent);
+          if (err) return console.error(err);
+        }
+      );
+
+      if (err) return console.error(err);
+    }
+  );
+
+
+});
+
 
 app.get('/allmonths', (req, res) => {      //get all months (for axis)
   pool.query(
